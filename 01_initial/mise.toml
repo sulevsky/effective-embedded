@@ -1,0 +1,11 @@
+[tools]
+# rust = "latest"
+
+[tasks.run]
+run = "cargo run"
+
+# probe-rs list
+# cargo build - builds
+# cargo embed - builds and flashes
+[env]
+HELLO="hello"
