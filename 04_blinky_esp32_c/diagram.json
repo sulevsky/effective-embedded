@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "author": "Vova",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-s3-devkitc-1",
+      "id": "esp32",
+      "top": 0,
+      "left": -24.28
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 140.4,
+      "left": 81,
+      "attrs": { "color": "limegreen", "flip": "1" }
+    }
+  ],
+  "connections": [
+    [ "esp32:A3", "$serialMonitor:TX", "green", [] ],
+    [ "esp32:A2", "$serialMonitor:RX", "green", [] ],
+    [ "led1:A", "esp32:2", "green", [ "v0" ] ],
+    [ "led1:C", "esp32:GND.1", "black", [ "v37.5", "h-139.07", "v-38.4" ] ]
+  ]
+}
