@@ -1,0 +1,11 @@
+[tools]
+# rust = "latest"
+
+[tasks.build]
+run = "platformio run --environment esp32-s3-devkitm-1"
+
+[tasks.flash]
+run = "platformio run --target upload --environment esp32-s3-devkitm-1"
+
+[env]
+HELLO = "hello"
