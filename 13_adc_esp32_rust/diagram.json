@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "author": "Vova",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-s3-devkitc-1",
+      "id": "esp32",
+      "top": 28.62,
+      "left": 62.17,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-photoresistor-sensor",
+      "id": "ldr1",
+      "top": -25.6,
+      "left": -220,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    [ "esp32:RX", "$serialMonitor:TX", "green", [] ],
+    [ "esp32:TX", "$serialMonitor:RX", "green", [] ],
+    [ "ldr1:VCC", "esp32:3V3.1", "red", [ "h0" ] ],
+    [ "ldr1:GND", "esp32:GND.2", "black", [ "h0" ] ],
+    [ "ldr1:AO", "esp32:8", "green", [ "h28.8", "v152.9" ] ],
+    [ "ldr1:AO", "esp32:7", "orange", [ "h67.2", "v95.3" ] ]
+  ],
+  "dependencies": {}
+}
