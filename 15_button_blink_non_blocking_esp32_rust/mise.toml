@@ -1,0 +1,19 @@
+[tools]
+# rust = "latest"
+
+[tasks.run]
+run = "cargo run"
+
+[tasks.build]
+run = "cargo build"
+
+
+[tasks.flash]
+run = "cargo run --target xtensa-esp32s3-none-elf"
+
+[tasks.flash-release]
+run = "cargo run --target xtensa-esp32s3-none-elf --release"
+
+
+[env]
+HELLO = "hello"

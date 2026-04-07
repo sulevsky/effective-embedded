@@ -24,7 +24,7 @@ extern "C" void app_main(void)
     uint32_t last_boot_button_press = 0;
 
     bool current_is_first = true;
-    uint32_t iterations_num = true;
+    uint32_t iterations_num = 0;
     while (true)
     {
         uint32_t now = (uint32_t)(esp_timer_get_time() / CommonConfig::MILLIS_IN_MICROS);
