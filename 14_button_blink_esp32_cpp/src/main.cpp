@@ -1,0 +1,70 @@
+#include "driver/gpio.h"
+#include "esp_timer.h"
+#include "led.h"
+#include "button.h"
+#include "config.h"
+#include "time_utils.h"
+
+extern "C" void app_main(void)
+{
+
+    Led red(GPIOConfig::RED_LED_GPIO, ON);
+    red.init();
+    Led blue(GPIOConfig::BLUE_LED_GPIO, OFF);
+    blue.init();
+
+    Button extenal_button(GPIOConfig::EXTERNAL_BUTTON_GPIO);
+    extenal_button.init();
+    Button boot_button(GPIOConfig::BUTTON_BOOT);
+    boot_button.init();
+
+    uint32_t period = BlinkConfig::SLOW_PERIOD;
+
+    uint32_t last_external_button_press = 0;
+    uint32_t last_boot_button_press = 0;
+
+    bool current_is_first = true;
+    uint32_t iterations_num = true;
+    while (true)
+    {
+        uint32_t now = (uint32_t)(esp_timer_get_time() / CommonConfig::MILLIS_IN_MICROS);
+        if (is_expired(now, last_external_button_press, BlinkConfig::DEBOUNCING_TIME))
+        {
+            if (extenal_button.is_pressed())
+            {
+                period = BlinkConfig::FAST_PERIOD;
+                last_external_button_press = now;
+                printf("External button is pressed\n");
+            }
+        }
+        if (is_expired(now, last_boot_button_press, BlinkConfig::DEBOUNCING_TIME))
+        {
+            if (boot_button.is_pressed())
+            {
+                period = BlinkConfig::SLOW_PERIOD;
+                last_boot_button_press = now;
+                printf("Boot button is pressed\n");
+            }
+        }
+        bool next_is_first = is_first(now, period * 2, period);
+        if (current_is_first != next_is_first)
+        {
+            if (next_is_first)
+            {
+                blue.set_state(ON);
+                red.set_state(OFF);
+            }
+            else
+            {
+                blue.set_state(OFF);
+                red.set_state(ON);
+            }
+            current_is_first = next_is_first;
+        }
+        iterations_num++;
+        if (iterations_num % CommonConfig::DURATION_LOG_ONCE_PER == 0)
+        {
+            printf("Time: %lld, mean iteration time: %lld micros, number of iterations %ld\n", esp_timer_get_time(), (esp_timer_get_time() / iterations_num), iterations_num);
+        }
+    }
+}
