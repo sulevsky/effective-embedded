@@ -1,62 +1,55 @@
 #![no_std]
 #![no_main]
 
+mod button;
+mod config;
+mod led;
+
+use button::Button;
 use esp_backtrace as _;
-use esp_hal::delay::Delay;
-use esp_hal::gpio::{Input, InputConfig, Output, OutputConfig};
 use esp_hal::main;
+use esp_hal::time::{Duration, Instant};
 use esp_println::println;
+use led::Led;
+
 esp_bootloader_esp_idf::esp_app_desc!();
 
-const FAST_PERIOD: u32 = 100;
-const SLOW_PERIOD: u32 = 2000;
-
-const DEBOUNCING_TIME: u32 = 200;
-
-const LOOP_STEP: u32 = 10;
 #[main]
 fn main() -> ! {
     println!("Init...");
     let peripherals = esp_hal::init(esp_hal::Config::default());
 
-    let delay = Delay::new();
-    let output_config = OutputConfig::default();
-    let mut blue_led = Output::new(peripherals.GPIO4, esp_hal::gpio::Level::High, output_config);
-    let mut red_led = Output::new(peripherals.GPIO5, esp_hal::gpio::Level::Low, output_config);
+    let mut blue_led = Led::new(peripherals.GPIO4);
+    blue_led.toggle();
+    let mut red_led = Led::new(peripherals.GPIO5);
 
-    let input_config = InputConfig::default().with_pull(esp_hal::gpio::Pull::Up);
-    let external_button = Input::new(peripherals.GPIO19, input_config);
-    let boot_button = Input::new(peripherals.GPIO0, input_config);
+    let external_button = Button::new(peripherals.GPIO19, esp_hal::gpio::Pull::Up);
+    let boot_button = Button::new(peripherals.GPIO0, esp_hal::gpio::Pull::Up);
 
-    let mut period = SLOW_PERIOD;
-    let mut current_is_first = true;
-    let mut counter = 1u32;
+    let mut period = config::SLOW_PERIOD;
+    let mut last_toggle_at = Instant::now();
 
-    let mut external_button_unavailable_until = 0u32;
-    let mut boot_button_unavailable_until = 0u32;
+    let mut external_button_pressed_at =
+        Instant::EPOCH - config::DEBOUNCING_TIME - Duration::from_millis(1);
+    let mut boot_button_pressed_at =
+        Instant::EPOCH - config::DEBOUNCING_TIME - Duration::from_millis(1);
 
     loop {
-        if external_button_unavailable_until < counter && external_button.is_low() {
-            period = FAST_PERIOD;
-            external_button_unavailable_until = counter + DEBOUNCING_TIME;
+        let now = Instant::now();
+        if now - external_button_pressed_at >= config::DEBOUNCING_TIME && external_button.is_low() {
+            period = config::FAST_PERIOD;
+            external_button_pressed_at = now;
             println!("External button is pressed")
         }
-        if boot_button_unavailable_until < counter && boot_button.is_low() {
-            period = SLOW_PERIOD;
-            boot_button_unavailable_until = counter + DEBOUNCING_TIME;
+        if now - boot_button_pressed_at >= config::DEBOUNCING_TIME && boot_button.is_low() {
+            period = config::SLOW_PERIOD;
+            boot_button_pressed_at = now;
             println!("Boot button is pressed")
         }
-        let next_is_first = is_first(counter, period * 2, period);
-        if current_is_first != next_is_first {
+        if now - last_toggle_at >= period {
             blue_led.toggle();
             red_led.toggle();
-            current_is_first = next_is_first;
+            last_toggle_at = now;
         }
-        delay.delay_millis(LOOP_STEP);
-        counter += LOOP_STEP;
     }
-}
-
-fn is_first(counter: u32, full_period: u32, first_period: u32) -> bool {
-    first_period >= (counter % full_period)
 }

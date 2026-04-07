@@ -5,10 +5,12 @@
 run = "cargo run"
 
 [tasks.build]
+alias = "b"
 run = "cargo build"
 
 
 [tasks.flash]
+alias = "f"
 run = "cargo run --target xtensa-esp32s3-none-elf"
 
 [tasks.flash-release]
