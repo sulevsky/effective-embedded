@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "author": "Vova",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-breadboard-half", "id": "bb1", "top": -204.6, "left": -189.2, "attrs": {} },
+    {
+      "type": "board-esp32-s3-devkitc-1",
+      "id": "esp32",
+      "top": 38.22,
+      "left": 71.77,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": -82.45,
+      "left": 9.6,
+      "attrs": { "value": "0.22" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led2",
+      "top": -128.4,
+      "left": -15,
+      "attrs": { "color": "red", "flip": "1" }
+    },
+    { "type": "wokwi-photoresistor-sensor", "id": "ldr1", "top": 128, "left": -316, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp32:RX", "$serialMonitor:TX", "green", [] ],
+    [ "esp32:TX", "$serialMonitor:RX", "green", [] ],
+    [ "r2:2", "bb1:bn.20", "black", [ "v0" ] ],
+    [ "esp32:5", "bb1:18b.j", "violet", [ "h0" ] ],
+    [ "ldr1:VCC", "esp32:3V3.1", "red", [ "h67.2", "v-76.8" ] ],
+    [ "ldr1:AO", "esp32:8", "green", [ "h28.8", "v152.9" ] ],
+    [ "esp32:GND.1", "ldr1:GND", "black", [ "h-153.65", "v-115.2", "h-67.2" ] ],
+    [ "esp32:GND.2", "bb1:bn.25", "black", [ "v0" ] ],
+    [ "led2:A", "bb1:18b.f", "", [ "$bb" ] ],
+    [ "led2:C", "bb1:19b.f", "", [ "$bb" ] ],
+    [ "r2:1", "bb1:19b.g", "", [ "$bb" ] ],
+    [ "r2:2", "bb1:25b.g", "", [ "$bb" ] ]
+  ],
+  "dependencies": {}
+}
