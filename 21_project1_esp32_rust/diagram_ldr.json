@@ -28,7 +28,7 @@
     { "type": "wokwi-photoresistor-sensor", "id": "ldr1", "top": 128, "left": -316, "attrs": {} }
   ],
   "connections": [
-    [ "esp32:RX", "$serialMonitor:TX", "green",[] ],
+    [ "esp32:RX", "$serialMonitor:TX", "green", [] ],
     [ "esp32:TX", "$serialMonitor:RX", "green", [] ],
     [ "r2:2", "bb1:bn.20", "black", [ "v0" ] ],
     [ "esp32:5", "bb1:18b.j", "violet", [ "h0" ] ],
@@ -40,7 +40,7 @@
     [ "r2:2", "bb1:25b.g", "", [ "$bb" ] ],
     [ "led2:A", "bb1:18b.f", "", [ "$bb" ] ],
     [ "led2:C", "bb1:19b.f", "", [ "$bb" ] ],
-    [ "esp32:RST", "bb1:21b.j", "green", [ "h-48.05", "v-96" ] ]
+    [ "ldr1:AO", "esp32:9", "gold", [ "v28.1", "h220.85" ] ]
   ],
   "dependencies": {}
 }

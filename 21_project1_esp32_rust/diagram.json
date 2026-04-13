@@ -25,22 +25,23 @@
       "left": -15,
       "attrs": { "color": "red", "flip": "1" }
     },
-    { "type": "wokwi-photoresistor-sensor", "id": "ldr1", "top": 128, "left": -316, "attrs": {} }
+    { "type": "wokwi-potentiometer", "id": "pot1", "top": -10.9, "left": -326.6, "attrs": {} }
   ],
   "connections": [
-    [ "esp32:RX", "$serialMonitor:TX", "green",[] ],
+    [ "esp32:RX", "$serialMonitor:TX", "green", [] ],
     [ "esp32:TX", "$serialMonitor:RX", "green", [] ],
     [ "r2:2", "bb1:bn.20", "black", [ "v0" ] ],
     [ "esp32:5", "bb1:18b.j", "violet", [ "h0" ] ],
-    [ "ldr1:VCC", "esp32:3V3.1", "red", [ "h67.2", "v-76.8" ] ],
-    [ "ldr1:AO", "esp32:8", "green", [ "h28.8", "v152.9" ] ],
-    [ "esp32:GND.1", "ldr1:GND", "black", [ "h-153.65", "v-115.2", "h-67.2" ] ],
     [ "esp32:GND.2", "bb1:bn.25", "black", [ "v0" ] ],
     [ "r2:1", "bb1:19b.g", "", [ "$bb" ] ],
     [ "r2:2", "bb1:25b.g", "", [ "$bb" ] ],
     [ "led2:A", "bb1:18b.f", "", [ "$bb" ] ],
     [ "led2:C", "bb1:19b.f", "", [ "$bb" ] ],
-    [ "esp32:RST", "bb1:21b.j", "green", [ "h-48.05", "v-96" ] ]
+    [ "esp32:GND.1", "pot1:GND", "black", [ "h0" ] ],
+    [ "esp32:3V3.1", "pot1:VCC", "red", [ "v0" ] ],
+    [ "esp32:8", "pot1:SIG", "green", [ "h-355.25", "v-115.2" ] ],
+    [ "esp32:9", "pot1:SIG", "gold", [ "h0" ] ]
   ],
-  "dependencies": {}
+  "dependencies": {},
+  "serialMonitor": { "display": "terminal","convertEol": true, "newline": "crlf" }
 }
