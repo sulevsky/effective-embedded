@@ -8,13 +8,13 @@
 Трохи більша затримка реакції
 
 # State machine
-|State\Event|PRESS|RELEASE|TIMEOUT|NONE|
-|-|-|-|-|-|
-|STATE_IDLE|STATE_PRESSED, Start timer 50 ms|-|-|-|
-|STATE_PRESSED|-|-|STATE_HELD_SHORT, Start timer 20000 ms|-|
-|STATE_HELD_SHORT|-|STATE_RELEASED, short_press_num incr, Start timer 50 ms|STATE_HELD_LONG|-|
-|STATE_HELD_LONG|-|STATE_RELEASED, long_press_num incr, Start timer 50 ms|-|-|
-|STATE_RELEASED|-|-|STATE_IDLE|-|
+|State\Event|PRESS|RELEASE|TIMEOUT|
+|-|-|-|-|
+|STATE_IDLE|STATE_PRESSED, Start timer 50 ms|-|-|
+|STATE_PRESSED|-|-|STATE_HELD_SHORT, Start timer 20000 ms|
+|STATE_HELD_SHORT|-|STATE_RELEASED, short_press_num incr, Start timer 50 ms|STATE_HELD_LONG|
+|STATE_HELD_LONG|-|STATE_RELEASED, long_press_num incr, Start timer 50 ms|-|
+|STATE_RELEASED|-|-|STATE_IDLE|
 
 
  	 	 	 
