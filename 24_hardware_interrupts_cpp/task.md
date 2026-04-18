@@ -65,9 +65,9 @@ Release не викликає дії
 |State\Event|PRESS|RELEASE|TIMEOUT|NONE|
 |-|-|-|-|-|
 |STATE_IDLE|STATE_PRESSED, Start timer 50 ms|-|-|-|
-|STATE_PRESSED|-|-|STATE_HELD_SHORT, short_press_num incr, Start timer 20000 ms|-|
-|STATE_HELD_SHORT|-|STATE_RELEASED, Start timer 50 ms|STATE_HELD_LONG, long_press_num incr|-|
-|STATE_HELD_LONG|-|STATE_RELEASED, Start timer 50 ms|-|-|
+|STATE_PRESSED|-|-|STATE_HELD_SHORT, Start timer 2000 ms|-|
+|STATE_HELD_SHORT|-|STATE_RELEASED, short_press_num incr, Start timer 50 ms|STATE_HELD_LONG|-|
+|STATE_HELD_LONG|-|STATE_RELEASED, Start timer 50 ms, long_press_num incr|-|-|
 |STATE_RELEASED|-|-|STATE_IDLE|-|
 
 

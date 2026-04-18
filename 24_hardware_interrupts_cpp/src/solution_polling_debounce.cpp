@@ -111,7 +111,7 @@ void solution_polling_debounce()
                 break;
             case TIMEOUT:
                 current_state = STATE_HELD_SHORT;
-                short_press_num++;
+                
                 start_timer(ButtonConfig::HELD_LONG_MIN_TIME_MICROS);
                 break;
             case NONE:
@@ -127,11 +127,11 @@ void solution_polling_debounce()
                 break;
             case RELEASE:
                 current_state = STATE_RELEASED;
+                short_press_num++;
                 start_timer(ButtonConfig::DEFAULT_DEBOUNCE_DELAY_MICROS);
                 break;
             case TIMEOUT:
                 current_state = STATE_HELD_LONG;
-                long_press_num++;
                 break;
             case NONE:
                 /* empty */
@@ -146,6 +146,7 @@ void solution_polling_debounce()
                 break;
             case RELEASE:
                 current_state = STATE_RELEASED;
+                long_press_num++;
                 start_timer(ButtonConfig::DEFAULT_DEBOUNCE_DELAY_MICROS);
                 break;
             case TIMEOUT:
@@ -174,7 +175,7 @@ void solution_polling_debounce()
             }
             break;
         }
-
+        // No need for delay 
         // delay(ButtonConfig::POLL_DELAY_MILLIS);
     }
 
