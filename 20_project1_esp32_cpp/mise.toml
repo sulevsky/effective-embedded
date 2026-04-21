@@ -12,7 +12,7 @@ run = "platformio run --target upload --environment esp32-s3-devkitm-1"
 alias = "fm"
 run = "platformio run --target upload --target monitor --environment esp32-s3-devkitm-1"
 [tasks.test]
-run = "platformio test -e native"
+run = "platformio test -e native -v"
 
 
 [env]

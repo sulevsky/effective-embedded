@@ -14,8 +14,8 @@ private:
     static const adc_bitwidth_t _RESOLUTION = ADC_BITWIDTH_12;
     adc_oneshot_unit_handle_t _adc_handle;
     adc_cali_handle_t _cali_handle;
-    adc_unit_t _unit_id;
-    adc_channel_t _channel;
+    const adc_unit_t _unit_id;
+    const adc_channel_t _channel;
 
 public:
     static const uint32_t RESOLUTION_MAX_VALUE = ((1 << _RESOLUTION) - 1);

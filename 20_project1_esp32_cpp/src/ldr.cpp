@@ -63,9 +63,9 @@ int MaSmoothedLdr::read_smoothed()
     int sensor_data = _ldr->read_calibrated();
     if (!_is_initialized)
     {
-        for (int i = 0; i < _BUFFER_SIZE; i++)
+        for (int &el : _buffer)
         {
-            _buffer[i] = sensor_data;
+            el = sensor_data;
         }
         _next_element = 1;
         _is_initialized = true;
@@ -80,9 +80,9 @@ int MaSmoothedLdr::read_smoothed()
 int MaSmoothedLdr::mean()
 {
     int result = 0;
-    for (int i = 0; i < _BUFFER_SIZE; i++)
+    for (auto el : _buffer)
     {
-        result += _buffer[i];
+        result += el;
     }
     return result / _BUFFER_SIZE;
 }

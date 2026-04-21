@@ -3,10 +3,7 @@
 #include "led.h"
 #include "driver/ledc.h"
 
-Led::Led(gpio_num_t gpio_num)
-{
-    _gpio_num = gpio_num;
-}
+Led::Led(gpio_num_t gpio_num) : _gpio_num(gpio_num) {};
 
 void Led::init()
 {

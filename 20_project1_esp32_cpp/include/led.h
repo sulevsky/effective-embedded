@@ -12,7 +12,7 @@ private:
     static const ledc_timer_t TIMER = LEDC_TIMER_0;
     static const ledc_channel_t CHANNEL = LEDC_CHANNEL_0;
 
-    gpio_num_t _gpio_num;
+    const gpio_num_t _gpio_num;
 
 public:
     Led(gpio_num_t gpio_num);
