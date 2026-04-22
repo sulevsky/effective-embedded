@@ -5,10 +5,10 @@
 class Button
 {
 private:
-    gpio_num_t _gpio_num;
+    const gpio_num_t _gpio_num;
 
 public:
-    Button(gpio_num_t gpio_num);
+    Button(const gpio_num_t gpio_num);
     void init();
     bool is_pressed();
 };

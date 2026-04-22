@@ -1,6 +1,6 @@
 #include "button.h"
 
-Button::Button(gpio_num_t gpio_num) : _gpio_num(gpio_num) {}
+Button::Button(const gpio_num_t gpio_num) : _gpio_num(gpio_num) {}
 
 void Button::init()
 {
