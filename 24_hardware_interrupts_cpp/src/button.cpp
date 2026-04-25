@@ -31,7 +31,7 @@ void Button::init(gpio_int_type_t intr_type)
     gpio_set_intr_type(_gpio_num, intr_type);
 
     gpio_install_isr_service(ButtonConfig::ESP_INTR_FLAG_DEFAULT);
-    gpio_isr_handler_add(ButtonConfig::BUTTON_GPIO, gpio_isr_handler, (void *)ButtonConfig::BUTTON_GPIO);
+    gpio_isr_handler_add(_gpio_num, gpio_isr_handler, (void *)_gpio_num);
 }
 
 uint32_t Button::get_counter()
