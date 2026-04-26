@@ -3,7 +3,6 @@
 #include "button.h"
 #include "config.h"
 #include "time_utils.h"
-#include "esp_adc/adc_oneshot.h"
 #include "esp_cpu.h"
 
 typedef enum
@@ -29,7 +28,7 @@ static uint64_t timeout_delay = 0;
 
 static bool last_button_is_pressed = false;
 
-void start_timer(uint64_t delay_micros)
+void start_timer(const uint64_t delay_micros)
 {
     timer_set = true;
     timeout_timer_started_at_micros = now_micros();
@@ -66,18 +65,18 @@ void solution_polling_debounce()
     printf("Experiment 4: polling debounce  - started\n");
 
     printf("Init button, with debounce\n");
-    Button button(ButtonConfig::BUTTON_GPIO);
+    Button button(Config::Button::BUTTON_GPIO);
     button.init(GPIO_INTR_DISABLE);
 
     uint32_t short_press_num = 0;
     uint32_t long_press_num = 0;
 
     uint32_t waiting_start_time_ms = now_millis();
-    printf("Press button %ld times, for %ld seconds\n", ExperimentConfig::NUMBER_OF_PRESSES_PER_EXPERIMENT, ExperimentConfig::EXPERIMENT_TIME_MILLIS / CommonConfig::MILLIS_IN_SECONDS);
+    printf("Press button %ld times, for %ld seconds\n", Config::Experiment::NUMBER_OF_PRESSES_PER_EXPERIMENT, Config::Experiment::EXPERIMENT_TIME_MILLIS / Config::Common::MILLIS_IN_SECONDS);
     printf("Waiting...\n");
 
     state_t current_state = STATE_IDLE;
-    while (!is_expired(now_millis(), waiting_start_time_ms, ExperimentConfig::EXPERIMENT_TIME_MILLIS))
+    while (!is_expired(now_millis(), waiting_start_time_ms, Config::Experiment::EXPERIMENT_TIME_MILLIS))
     {
         event_t event = get_latest_event(&button);
         switch (current_state)
@@ -87,7 +86,7 @@ void solution_polling_debounce()
             {
             case PRESS:
                 current_state = STATE_PRESSED;
-                start_timer(ButtonConfig::DEFAULT_DEBOUNCE_DELAY_MICROS);
+                start_timer(Config::Button::DEFAULT_DEBOUNCE_DELAY_MICROS);
                 break;
             case RELEASE:
                 /* empty */
@@ -111,8 +110,8 @@ void solution_polling_debounce()
                 break;
             case TIMEOUT:
                 current_state = STATE_HELD_SHORT;
-                
-                start_timer(ButtonConfig::HELD_LONG_MIN_TIME_MICROS);
+
+                start_timer(Config::Button::HELD_LONG_MIN_TIME_MICROS);
                 break;
             case NONE:
                 /* empty */
@@ -128,7 +127,7 @@ void solution_polling_debounce()
             case RELEASE:
                 current_state = STATE_RELEASED;
                 short_press_num++;
-                start_timer(ButtonConfig::DEFAULT_DEBOUNCE_DELAY_MICROS);
+                start_timer(Config::Button::DEFAULT_DEBOUNCE_DELAY_MICROS);
                 break;
             case TIMEOUT:
                 current_state = STATE_HELD_LONG;
@@ -147,7 +146,7 @@ void solution_polling_debounce()
             case RELEASE:
                 current_state = STATE_RELEASED;
                 long_press_num++;
-                start_timer(ButtonConfig::DEFAULT_DEBOUNCE_DELAY_MICROS);
+                start_timer(Config::Button::DEFAULT_DEBOUNCE_DELAY_MICROS);
                 break;
             case TIMEOUT:
                 /* empty */
@@ -175,7 +174,7 @@ void solution_polling_debounce()
             }
             break;
         }
-        // No need for delay 
+        // No need for delay
         // delay(ButtonConfig::POLL_DELAY_MILLIS);
     }
 

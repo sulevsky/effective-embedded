@@ -1,11 +1,27 @@
 #pragma once
 
 #include "stdint.h"
+#include "freertos/FreeRTOS.h"
+#include "esp_timer.h"
 
-bool is_expired(uint32_t now, uint32_t last_event, uint32_t timeout);
+inline bool is_expired(const uint32_t now, const uint32_t last_event, const uint32_t timeout)
+{
+    return (now - last_event) >= timeout;
+}
 
-uint32_t now_millis();
+inline uint32_t now_millis()
+{
 
-uint64_t now_micros();
+    return (uint32_t)(esp_timer_get_time() / Config::Common::MILLIS_IN_SECONDS);
+}
 
-void delay(uint32_t millis);
+inline uint64_t now_micros()
+{
+
+    return (uint64_t)esp_timer_get_time();
+}
+
+inline void delay(uint32_t millis)
+{
+    vTaskDelay(pdMS_TO_TICKS(millis));
+}

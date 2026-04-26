@@ -1,3 +1,3 @@
 #pragma once
 
-void  solution_polling_debounce();
+void solution_polling_debounce();
