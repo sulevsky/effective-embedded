@@ -5,22 +5,18 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-volatile uint64_t measurement_end = 0;
-volatile gpio_num_t GPIO_NUM = GPIO_NUM_NC;
-
 static void IRAM_ATTR gpio_isr_handler(void *arg)
 {
-    uint32_t gpio_num = (uint32_t)arg;
+    Input *input = (Input *)arg;
     // measurement_end == 0 is debouncing
-    if (gpio_num == GPIO_NUM && measurement_end == 0)
+    if (input->get_measurement_end() == 0)
     {
-        measurement_end = now_micros();
+        input->set_measurement_end(now_micros());
     }
 }
 
-Input::Input(gpio_num_t gpio_num) : _gpio_num(gpio_num)
+Input::Input(gpio_num_t gpio_num) : _gpio_num(gpio_num), measurement_end(0)
 {
-    GPIO_NUM = gpio_num;
 }
 
 void Input::init()
@@ -30,8 +26,8 @@ void Input::init()
     gpio_set_pull_mode(_gpio_num, GPIO_PULLUP_ONLY);
     gpio_set_intr_type(_gpio_num, GPIO_INTR_NEGEDGE);
 
-    gpio_install_isr_service(InputConfig::ESP_INTR_FLAG_DEFAULT);
-    gpio_isr_handler_add(InputConfig::INPUT_GPIO, gpio_isr_handler, (void *)InputConfig::INPUT_GPIO);
+    gpio_install_isr_service(Config::Input::ESP_INTR_FLAG_DEFAULT);
+    gpio_isr_handler_add(_gpio_num, gpio_isr_handler, (void *)this);
 }
 
 bool Input::is_on()
@@ -39,9 +35,14 @@ bool Input::is_on()
     return gpio_get_level(_gpio_num) == 0;
 }
 
-uint64_t Input::get_measurement_end()
+IRAM_ATTR uint64_t Input::get_measurement_end()
 {
     return measurement_end;
+}
+
+IRAM_ATTR void Input::set_measurement_end(const uint64_t end)
+{
+    measurement_end = end;
 }
 
 void Input::reset_measurement()
