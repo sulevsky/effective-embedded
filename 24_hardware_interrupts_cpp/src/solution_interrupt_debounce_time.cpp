@@ -3,7 +3,6 @@
 #include "button.h"
 #include "config.h"
 #include "time_utils.h"
-#include "esp_adc/adc_oneshot.h"
 #include "esp_cpu.h"
 
 void solution_interrupt_debounce_time()
@@ -11,20 +10,20 @@ void solution_interrupt_debounce_time()
     printf("Experiment 2: time debounce in interrupt  - started\n");
 
     printf("Init button, with debounce\n");
-    Button button(ButtonConfig::BUTTON_GPIO);
+    Button button(Config::Button::BUTTON_GPIO);
     button.init(GPIO_INTR_NEGEDGE);
     uint32_t counter = 0;
     uint64_t last_registered_time = 0;
 
     uint32_t waiting_start_time_ms = now_millis();
-    printf("Press button %ld times, for %ld seconds\n", ExperimentConfig::NUMBER_OF_PRESSES_PER_EXPERIMENT, ExperimentConfig::EXPERIMENT_TIME_MILLIS / CommonConfig::MILLIS_IN_SECONDS);
+    printf("Press button %ld times, for %ld seconds\n", Config::Experiment::NUMBER_OF_PRESSES_PER_EXPERIMENT, Config::Experiment::EXPERIMENT_TIME_MILLIS / Config::Common::MILLIS_IN_SECONDS);
     printf("Waiting...\n");
-    while (!is_expired(now_millis(), waiting_start_time_ms, ExperimentConfig::EXPERIMENT_TIME_MILLIS))
+    while (!is_expired(now_millis(), waiting_start_time_ms, Config::Experiment::EXPERIMENT_TIME_MILLIS))
     {
         if (button.is_triggered())
         {
             auto now = now_micros();
-            if (is_expired(now, last_registered_time, ButtonConfig::DEFAULT_DEBOUNCE_DELAY_MICROS))
+            if (is_expired(now, last_registered_time, Config::Button::DEFAULT_DEBOUNCE_DELAY_MICROS))
             {
                 counter += 1;
                 last_registered_time = now;
