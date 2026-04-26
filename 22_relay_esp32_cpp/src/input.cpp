@@ -8,19 +8,19 @@
 static void IRAM_ATTR gpio_isr_handler(void *arg)
 {
     Input *input = (Input *)arg;
-    // measurement_end == 0 is debouncing
-    if (input->get_measurement_end() == 0)
-    {
-        input->set_measurement_end(now_micros());
-    }
+    uint64_t now = now_micros();
+    BaseType_t woken = pdFALSE;
+    xQueueSendFromISR(input->queue, &now, &woken);
+    portYIELD_FROM_ISR(woken);
 }
 
-Input::Input(gpio_num_t gpio_num) : _gpio_num(gpio_num), measurement_end(0)
+Input::Input(gpio_num_t gpio_num) : _gpio_num(gpio_num), queue(NULL)
 {
 }
 
 void Input::init()
 {
+    queue = xQueueCreate(1, sizeof(uint64_t));
     gpio_reset_pin(_gpio_num);
     gpio_set_direction(_gpio_num, GPIO_MODE_INPUT);
     gpio_set_pull_mode(_gpio_num, GPIO_PULLUP_ONLY);
@@ -35,17 +35,9 @@ bool Input::is_on()
     return gpio_get_level(_gpio_num) == 0;
 }
 
-IRAM_ATTR uint64_t Input::get_measurement_end()
+uint64_t Input::get_measurement_end_blocking()
 {
+    uint64_t measurement_end = 0;
+    xQueueReceive(this->queue, &measurement_end, Config::Input::MEASUREMENT_WAIT_TIME);
     return measurement_end;
-}
-
-IRAM_ATTR void Input::set_measurement_end(const uint64_t end)
-{
-    measurement_end = end;
-}
-
-void Input::reset_measurement()
-{
-    measurement_end = 0;
 }

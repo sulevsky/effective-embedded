@@ -4,7 +4,6 @@
 #include "actuator.h"
 #include "config.h"
 #include "time_utils.h"
-#include "esp_adc/adc_oneshot.h"
 #include "esp_cpu.h"
 
 uint64_t measure_delay(Actuator *actuator, Input *input)
@@ -29,21 +28,17 @@ void solution_interrupt()
 
     Actuator actuator(Config::Actuator::ACTUATOR_GPIO, Actuator::ActuatorState::OFF);
     actuator.init();
+    delay(Config::Common::INITIALIZATION_DELAY_MILLIS);
     while (true)
     {
         printf("Starting measurement\n");
         uint64_t time_measurements_sum = 0;
         for (uint32_t i = 0; i < Config::Common::MEASUREMENTS_NUM; i++)
         {
-            input.reset_measurement();
             uint64_t start = now_micros();
             actuator.set_state(Actuator::ActuatorState::ON);
-            esp_cpu_wait_for_intr(); // works ok but fails on first invocation
-            while (input.get_measurement_end() == 0)
-            {
-            }
-
-            uint64_t duration = input.get_measurement_end() - start;
+            uint64_t end = input.get_measurement_end_blocking();
+            uint64_t duration = end - start;
             printf("Iteration: %ld, delay: %lld micros\n", i, duration);
             time_measurements_sum += duration;
             actuator.set_state(Actuator::ActuatorState::OFF);
