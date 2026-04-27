@@ -5,22 +5,22 @@
 #include "time_utils.h"
 #include "esp_cpu.h"
 
-typedef enum
+enum class Event
 {
     PRESS,
     RELEASE,
     TIMEOUT,
     NONE,
-} event_t;
+};
 
-typedef enum
+enum class State
 {
-    STATE_IDLE,
-    STATE_PRESSED,
-    STATE_HELD_SHORT,
-    STATE_HELD_LONG,
-    STATE_RELEASED,
-} state_t;
+    IDLE,
+    PRESSED,
+    HELD_SHORT,
+    HELD_LONG,
+    RELEASED,
+};
 
 static bool timer_set = false;
 static uint64_t timeout_timer_started_at_micros = 0;
@@ -34,29 +34,30 @@ void start_timer(const uint64_t delay_micros)
     timeout_timer_started_at_micros = now_micros();
     timeout_delay = delay_micros;
 }
-event_t get_latest_event(Button *button)
+
+Event get_latest_event(Button *button)
 {
     bool current_button_is_pressed = button->is_pressed();
     if (!last_button_is_pressed && current_button_is_pressed)
     {
         last_button_is_pressed = true;
-        return PRESS;
+        return Event::PRESS;
     }
     else if (last_button_is_pressed && !current_button_is_pressed)
     {
         last_button_is_pressed = false;
-        return RELEASE;
+        return Event::RELEASE;
     }
     else if (timer_set && is_expired(now_micros(), timeout_timer_started_at_micros, timeout_delay))
     {
         timer_set = false;
         timeout_timer_started_at_micros = 0;
         timeout_delay = 0;
-        return TIMEOUT;
+        return Event::TIMEOUT;
     }
     else
     {
-        return NONE;
+        return Event::NONE;
     }
 }
 
@@ -75,100 +76,100 @@ void solution_polling_debounce()
     printf("Press button %ld times, for %ld seconds\n", Config::Experiment::NUMBER_OF_PRESSES_PER_EXPERIMENT, Config::Experiment::EXPERIMENT_TIME_MILLIS / Config::Common::MILLIS_IN_SECONDS);
     printf("Waiting...\n");
 
-    state_t current_state = STATE_IDLE;
+    State current_state = State::IDLE;
     while (!is_expired(now_millis(), waiting_start_time_ms, Config::Experiment::EXPERIMENT_TIME_MILLIS))
     {
-        event_t event = get_latest_event(&button);
+        Event event = get_latest_event(&button);
         switch (current_state)
         {
-        case STATE_IDLE:
+        case State::IDLE:
             switch (event)
             {
-            case PRESS:
-                current_state = STATE_PRESSED;
+            case Event::PRESS:
+                current_state = State::PRESSED;
                 start_timer(Config::Button::DEFAULT_DEBOUNCE_DELAY_MICROS);
                 break;
-            case RELEASE:
+            case Event::RELEASE:
                 /* empty */
                 break;
-            case TIMEOUT:
+            case Event::TIMEOUT:
                 /* empty */
                 break;
-            case NONE:
+            case Event::NONE:
                 /* empty */
                 break;
             }
             break;
-        case STATE_PRESSED:
+        case State::PRESSED:
             switch (event)
             {
-            case PRESS:
+            case Event::PRESS:
                 /* empty */
                 break;
-            case RELEASE:
+            case Event::RELEASE:
                 /* empty */
                 break;
-            case TIMEOUT:
-                current_state = STATE_HELD_SHORT;
+            case Event::TIMEOUT:
+                current_state = State::HELD_SHORT;
 
                 start_timer(Config::Button::HELD_LONG_MIN_TIME_MICROS);
                 break;
-            case NONE:
+            case Event::NONE:
                 /* empty */
                 break;
             }
             break;
-        case STATE_HELD_SHORT:
+        case State::HELD_SHORT:
             switch (event)
             {
-            case PRESS:
+            case Event::PRESS:
                 /* empty */
                 break;
-            case RELEASE:
-                current_state = STATE_RELEASED;
+            case Event::RELEASE:
+                current_state = State::RELEASED;
                 short_press_num++;
                 start_timer(Config::Button::DEFAULT_DEBOUNCE_DELAY_MICROS);
                 break;
-            case TIMEOUT:
-                current_state = STATE_HELD_LONG;
+            case Event::TIMEOUT:
+                current_state = State::HELD_LONG;
                 break;
-            case NONE:
+            case Event::NONE:
                 /* empty */
                 break;
             }
             break;
-        case STATE_HELD_LONG:
+        case State::HELD_LONG:
             switch (event)
             {
-            case PRESS:
+            case Event::PRESS:
                 /* empty */
                 break;
-            case RELEASE:
-                current_state = STATE_RELEASED;
+            case Event::RELEASE:
+                current_state = State::RELEASED;
                 long_press_num++;
                 start_timer(Config::Button::DEFAULT_DEBOUNCE_DELAY_MICROS);
                 break;
-            case TIMEOUT:
+            case Event::TIMEOUT:
                 /* empty */
                 break;
-            case NONE:
+            case Event::NONE:
                 /* empty */
                 break;
             }
             break;
-        case STATE_RELEASED:
+        case State::RELEASED:
             switch (event)
             {
-            case PRESS:
+            case Event::PRESS:
                 /* empty */
                 break;
-            case RELEASE:
+            case Event::RELEASE:
                 /* empty*/
                 break;
-            case TIMEOUT:
-                current_state = STATE_IDLE;
+            case Event::TIMEOUT:
+                current_state = State::IDLE;
                 break;
-            case NONE:
+            case Event::NONE:
                 /* empty */
                 break;
             }

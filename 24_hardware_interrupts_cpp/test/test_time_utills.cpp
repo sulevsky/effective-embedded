@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <unity.h>
-#include "time_utils.cpp"
+#include "time_utils.h"
 
 void test_overflow()
 {

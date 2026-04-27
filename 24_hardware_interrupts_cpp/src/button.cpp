@@ -5,16 +5,18 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-volatile uint32_t counter = 0;
-volatile bool is_triggered_flag = false;
-
 static void IRAM_ATTR gpio_isr_handler(void *arg)
 {
-    counter += 1;
-    is_triggered_flag = true;
+    Button *button = (Button *)arg;
+    button->increment_counter();
+    button->set_is_triggered_flag();
 }
 
-Button::Button(const gpio_num_t gpio_num) : _gpio_num(gpio_num) {};
+Button::Button(const gpio_num_t gpio_num) : _gpio_num(gpio_num)
+{
+    counter = 0;
+    is_triggered_flag = false;
+};
 
 Button::~Button()
 {
@@ -39,6 +41,21 @@ uint32_t Button::get_counter()
     return counter;
 }
 
+IRAM_ATTR void Button::increment_counter()
+{
+    counter += 1;
+}
+
+IRAM_ATTR void Button::set_is_triggered_flag()
+{
+    is_triggered_flag = true;
+}
+
+void Button::reset_is_triggered_flag()
+{
+    is_triggered_flag = false;
+}
+
 void Button::reset()
 {
     counter = 0;
@@ -48,11 +65,6 @@ void Button::reset()
 bool Button::is_triggered()
 {
     return is_triggered_flag;
-}
-
-void Button::reset_triggered_flag()
-{
-    is_triggered_flag = false;
 }
 
 bool Button::is_pressed()

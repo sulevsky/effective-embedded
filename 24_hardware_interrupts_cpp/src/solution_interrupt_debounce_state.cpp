@@ -34,7 +34,7 @@ void solution_interrupt_debounce_state()
             {
                 last_button_is_pressed = false;
             }
-            button.reset_triggered_flag();
+            button.reset_is_triggered_flag();
         }
     }
 
