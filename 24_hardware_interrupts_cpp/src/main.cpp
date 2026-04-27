@@ -12,9 +12,9 @@ extern "C" void app_main(void)
         printf("--------------------\n");
         printf("Starting experiments\n");
         solution_interrupt_no_debounce();
-        // solution_interrupt_debounce_time();
-        // solution_interrupt_debounce_state();
-        // solution_polling_debounce();
+        solution_interrupt_debounce_time();
+        solution_interrupt_debounce_state();
+        solution_polling_debounce();
         printf("Finished experiments\n");
         printf("--------------------\n\n");
         printf("Restarting in %ld seconds...\n\n", Config::Common::DELAY_BETWEEN_EXPERIMENTS_BATCH_MILLIS / Config::Common::MILLIS_IN_SECONDS);

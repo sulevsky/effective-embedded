@@ -28,7 +28,7 @@ void solution_interrupt_debounce_time()
                 counter += 1;
                 last_registered_time = now;
             }
-            button.reset_triggered_flag();
+            button.reset_is_triggered_flag();
         }
     }
 
