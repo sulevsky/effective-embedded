@@ -1,13 +1,14 @@
-use embassy_stm32::gpio::Output;
-use embassy_time::{Duration, Instant};
+use core::time::Duration;
 
-pub struct Led<'d> {
-    output: Output<'d>,
+use stm32f4xx_hal::gpio::{AnyPin, Output};
+
+pub struct Led {
+    output: AnyPin<Output>,
     is_blinking: bool,
 }
 
-impl<'d> Led<'d> {
-    pub fn new(output: Output<'d>) -> Self {
+impl Led {
+    pub fn new(output: AnyPin<Output>) -> Self {
         Self {
             output,
             is_blinking: false,
@@ -24,14 +25,13 @@ impl<'d> Led<'d> {
     pub fn blinking(&mut self) {
         self.is_blinking = true;
     }
-    pub fn on_timer_event(&mut self, instant: Instant) {
+    pub fn on_timer_event(&mut self, now: Duration) {
         if !self.is_blinking {
             return;
         }
-        let blinking_period_duration = Duration::from_millis(500);
-        let duration_from_start_of_period =
-            instant.as_millis() % blinking_period_duration.as_millis();
-        let on_part_of_period = blinking_period_duration.as_millis() / 2;
+        let blinking_period_duration_ms = 500;
+        let duration_from_start_of_period = now.as_millis() % blinking_period_duration_ms;
+        let on_part_of_period = blinking_period_duration_ms / 2;
         if duration_from_start_of_period < on_part_of_period {
             self.output.set_high();
         } else {

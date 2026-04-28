@@ -38,6 +38,7 @@ dependencies = [
  "critical-section",
  "defmt 1.0.1",
  "defmt-rtt",
+ "embedded-hal 1.0.0",
  "panic-probe",
  "stm32f4xx-hal",
 ]
