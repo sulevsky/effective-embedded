@@ -2,7 +2,8 @@
 # rust = "latest"
 
 [env]
-PLATFORM = "blackpill_f401cc"
+PLATFORM = "nucleo_f446re"
+# PLATFORM = "blackpill_f401cc"
 # PLATFORM = "esp32-s3-devkitm-1"
 
 [tasks.build]
