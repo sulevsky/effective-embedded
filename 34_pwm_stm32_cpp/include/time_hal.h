@@ -8,7 +8,7 @@ inline uint32_t now_millis()
     return HAL_GetTick();
 }
 
-inline void delay(uint32_t millis)
+inline void delay(const uint32_t millis)
 {
     HAL_Delay(millis);
 }
