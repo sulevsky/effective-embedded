@@ -120,9 +120,9 @@ int main(void)
     uint32_t value = HAL_ADC_GetValue(&hadc1);
 
     printf("value %d\n", value);
-    int valu = value > 65000 ? 65000 : value;
+    int valu = value << 4;
     TIM1->CCR1 = valu;
-    TIM1->CCR2 = 65000 - valu;
+    TIM1->CCR2 = 65536 - valu;
     HAL_Delay(200);
   }
 }
@@ -213,7 +213,7 @@ static void MX_ADC1_Init(void)
 
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
-  sConfig.Channel = ADC_CHANNEL_7;
+  sConfig.Channel = ADC_CHANNEL_0;
   sConfig.Rank = 1;
   sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
