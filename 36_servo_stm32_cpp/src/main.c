@@ -44,7 +44,6 @@
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
-ADC_HandleTypeDef hadc2;
 
 TIM_HandleTypeDef htim1;
 
@@ -60,7 +59,6 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_ADC1_Init(void);
-static void MX_ADC2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -81,24 +79,39 @@ int _write(int file, char *ptr, int len)
 int main(void)
 {
 
+  /* USER CODE BEGIN 1 */
+
+  /* USER CODE END 1 */
+
   /* MCU Configuration--------------------------------------------------------*/
+
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
   /* Configure the system clock */
   SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   MX_TIM1_Init();
   MX_ADC1_Init();
-  MX_ADC2_Init();
+  /* USER CODE BEGIN 2 */
 
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+  /* USER CODE END 2 */
+
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   uint32_t last_now = now_millis();
   /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
   while (1)
   {
     if (!is_expired(now_millis(), last_now, DELAY_MILLIS))
@@ -106,15 +119,11 @@ int main(void)
       continue;
     }
     HAL_ADC_Start(&hadc1);
-    HAL_ADC_Start(&hadc2);
     HAL_ADC_PollForConversion(&hadc1, ADC_POLL_TIMEOUT_MILLIS);
-    HAL_ADC_PollForConversion(&hadc2, ADC_POLL_TIMEOUT_MILLIS);
-    uint32_t led_adc_value = HAL_ADC_GetValue(&hadc1);
-    uint32_t motor_adc_value = HAL_ADC_GetValue(&hadc2);
+    uint32_t adc_value = HAL_ADC_GetValue(&hadc1);
 
-    printf("led: %ld, motor: %ld\n", led_adc_value, motor_adc_value);
-    TIM1->CCR1 = TO_PWM_VALUE(led_adc_value);
-    TIM1->CCR2 = TO_PWM_VALUE(motor_adc_value);
+    printf("adc: %ld\n", adc_value);
+    TIM1->CCR2 = TO_PWM_VALUE(adc_value);
     last_now = now_millis();
   }
 }
@@ -219,58 +228,6 @@ static void MX_ADC1_Init(void)
 }
 
 /**
-  * @brief ADC2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_ADC2_Init(void)
-{
-
-  /* USER CODE BEGIN ADC2_Init 0 */
-
-  /* USER CODE END ADC2_Init 0 */
-
-  ADC_ChannelConfTypeDef sConfig = {0};
-
-  /* USER CODE BEGIN ADC2_Init 1 */
-
-  /* USER CODE END ADC2_Init 1 */
-
-  /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
-  */
-  hadc2.Instance = ADC2;
-  hadc2.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
-  hadc2.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc2.Init.ScanConvMode = DISABLE;
-  hadc2.Init.ContinuousConvMode = DISABLE;
-  hadc2.Init.DiscontinuousConvMode = DISABLE;
-  hadc2.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-  hadc2.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-  hadc2.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc2.Init.NbrOfConversion = 1;
-  hadc2.Init.DMAContinuousRequests = DISABLE;
-  hadc2.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
-  if (HAL_ADC_Init(&hadc2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-  */
-  sConfig.Channel = ADC_CHANNEL_1;
-  sConfig.Rank = 1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
-  if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN ADC2_Init 2 */
-
-  /* USER CODE END ADC2_Init 2 */
-
-}
-
-/**
   * @brief TIM1 Initialization Function
   * @param None
   * @retval None
@@ -323,10 +280,6 @@ static void MX_TIM1_Init(void)
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
   sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-  if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-  {
-    Error_Handler();
-  }
   if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
