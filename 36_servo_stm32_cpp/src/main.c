@@ -126,7 +126,9 @@ int main(void)
     uint32_t reverted_ccr = reverted_servo_ccr(servo_ccr);
     double degrees = into_degrees(servo_ccr);
     TIM1->CCR2 = reverted_ccr;
-    printf("adc: %ld, ccr: %ld, reverted ccr: %ld,  degrees: %.2f\n", adc_value, servo_ccr, reverted_ccr, degrees);
+
+    printf("\radc: %4ld, ccr: %4ld, reverted ccr: %4ld,  degrees: %.2f", adc_value, servo_ccr, reverted_ccr, degrees);
+    fflush(stdout);
     last_now = now_millis();
   }
 }
@@ -165,8 +167,7 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB buses clocks
    */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
@@ -227,7 +228,6 @@ static void MX_ADC1_Init(void)
   /* USER CODE BEGIN ADC1_Init 2 */
 
   /* USER CODE END ADC1_Init 2 */
-
 }
 
 /**
@@ -302,7 +302,6 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 2 */
   HAL_TIM_MspPostInit(&htim1);
-
 }
 
 /**
@@ -335,7 +334,6 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
-
 }
 
 /**
