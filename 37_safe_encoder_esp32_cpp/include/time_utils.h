@@ -12,8 +12,7 @@ inline bool is_expired(uint32_t now, uint32_t last_event, uint32_t timeout)
 
 inline uint32_t now_millis()
 {
-
-    return (uint32_t)(esp_timer_get_time() / CommonConfig::MILLIS_IN_SECONDS);
+    return (uint32_t)(esp_timer_get_time() / Config::Common::MILLIS_IN_SECONDS);
 }
 
 inline uint64_t now_micros()

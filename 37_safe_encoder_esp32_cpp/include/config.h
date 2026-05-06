@@ -2,17 +2,29 @@
 
 #include "driver/gpio.h"
 
-struct CommonConfig
-{
-    static const uint32_t MILLIS_IN_SECONDS = 1000;
-    static const uint32_t MICROS_IN_MILLIS = 1000;
-
-    static const uint32_t MICROSECOND_RESOLUTION = 1000000;
-    static const uint32_t INITIAL_ALARM_COUNT = 10 * MICROS_IN_MILLIS;
-};
-
 namespace Config
 {
+
+    namespace Common
+    {
+        static const uint8_t CODE_LENGTH = 4;
+        static const uint8_t MAX_TRIES = 3;
+
+        static const uint32_t MILLIS_IN_SECONDS = 1000;
+        static const uint8_t CODE[4] = {5, 4, 0, 9};
+    }
+
+    namespace Button
+    {
+        static const gpio_num_t BUTTON_GPIO = GPIO_NUM_17;
+        static const int ESP_INTR_FLAG_DEFAULT = 0;
+
+        static const uint32_t DEFAULT_DEBOUNCE_DELAY_MICROS = 50000;
+
+        static const uint32_t HELD_LONG_MIN_TIME_MICROS = 2000000;
+
+        static const uint32_t POLL_DELAY_MILLIS = 5;
+    };
     namespace Encoder
     {
         static const gpio_num_t ENCODER_GPIO_A = GPIO_NUM_15;

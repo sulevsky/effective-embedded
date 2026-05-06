@@ -7,8 +7,8 @@ void Encoder::init()
 {
     // unit
     pcnt_unit_config_t unit_config = {
-        .low_limit = -21,
-        .high_limit = 20,
+        .low_limit = -1000,
+        .high_limit = 1000,
     };
     pcnt_new_unit(&unit_config, &handle);
 
@@ -48,6 +48,5 @@ int32_t Encoder::get_count()
 {
     int result = 0;
     pcnt_unit_get_count(handle, &result);
-    // into 10 range
-    return static_cast<int32_t>(result / 4 + 5);
+    return static_cast<int32_t>(result / 4);
 }
