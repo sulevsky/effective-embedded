@@ -10,7 +10,19 @@
 - [x] read sensor baro
   - datasheet https://github.com/sparkfun/BMP180_Breakout/raw/master/Documentation/BMP180%20Datasheet%20V2.5.pdf
 
-- [ ] read sensor accel
+- [+] add/test libs
+  - async does not work
+  - sync requires old embedded-hal
+- [ ] add tests
+- [+] read sensor accel
+  - SpeedyBee F405 V3 (Stack/Mini)
+    - Gyro (IMU): BMI270 
+    - Barometer: SPL06-001 (often listed simply as SPL06)  
+  - Wokwi
+    - Gyro (IMU): MPU6050 
+    - Barometer: BMP180  
+
+
 - [x] log sensor
 - [ ] out sensor data Mavlink, watch in Mvalink debugger
 - [ ] add Kalman filter
