@@ -35,6 +35,7 @@ void draw_active(SafeState *safe_state)
     }
     printf("   LOCKED, tries left %d", safe_state->get_tries_left());
 }
+
 void draw_open()
 {
     printf("OPEN");

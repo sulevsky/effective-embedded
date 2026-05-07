@@ -1,5 +1,3 @@
-#pragma once
-
 #include "stdint.h"
 #include "safe_state.h"
 #include "esp_timer.h"
@@ -40,11 +38,11 @@ bool SafeState::reset_tries()
 {
     return tries == 0;
 };
-bool SafeState::is_counter_updated(uint8_t new_counter)
+bool SafeState::is_counter_updated(int32_t new_counter)
 {
     return new_counter != current_counter;
 };
-bool SafeState::is_direction_same(uint8_t new_counter)
+bool SafeState::is_direction_same(int32_t new_counter)
 {
     bool is_new_direction_increment = new_counter > current_counter;
     return is_current_direction_increment == is_new_direction_increment;
@@ -61,7 +59,7 @@ void SafeState::increment_position()
 {
     curent_position++;
 };
-void SafeState::update_counter(uint8_t new_counter)
+void SafeState::update_counter(int32_t new_counter)
 {
     current_counter = new_counter;
 };

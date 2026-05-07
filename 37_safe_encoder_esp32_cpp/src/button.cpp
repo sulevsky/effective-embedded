@@ -44,12 +44,5 @@ void Button::reset_is_triggered_flag()
 
 bool Button::is_triggered()
 {
-    // if (is_triggered_flag)
-    // {
-
-    //     printf("trigger!!\n")
-    // }
-    return false;
-    // todo vova temp disabled
-    // return is_triggered_flag;
+    return is_triggered_flag;
 }

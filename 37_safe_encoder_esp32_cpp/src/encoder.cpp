@@ -1,4 +1,5 @@
 #include "encoder.h"
+#include "config.h"
 #include "driver/pulse_cnt.h"
 
 Encoder::Encoder(const gpio_num_t gpio_num_a, const gpio_num_t gpio_num_b) : gpio_num_a(gpio_num_a), gpio_num_b(gpio_num_b) {}
@@ -7,14 +8,14 @@ void Encoder::init()
 {
     // unit
     pcnt_unit_config_t unit_config = {
-        .low_limit = -1000,
-        .high_limit = 1000,
+        .low_limit = Config::Encoder::LOW_LIMIT,
+        .high_limit = Config::Encoder::HIGH_LIMIT,
     };
     pcnt_new_unit(&unit_config, &handle);
 
     // glitch filter
     pcnt_glitch_filter_config_t filter_config = {
-        .max_glitch_ns = 1000,
+        .max_glitch_ns = 10000,
     };
     pcnt_unit_set_glitch_filter(handle, &filter_config);
 
@@ -48,5 +49,5 @@ int32_t Encoder::get_count()
 {
     int result = 0;
     pcnt_unit_get_count(handle, &result);
-    return static_cast<int32_t>(result / 4);
+    return static_cast<int32_t>(result / Config::Encoder::CYCLE_LENGTH);
 }
