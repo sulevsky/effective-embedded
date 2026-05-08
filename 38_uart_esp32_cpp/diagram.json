@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "author": "Vova",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-s3-devkitc-1",
+      "id": "esp32",
+      "top": -67.38,
+      "left": 311.77,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": -118.8,
+      "left": 484.2,
+      "attrs": { "color": "red", "flip": "1" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": -13,
+      "left": 172.8,
+      "attrs": { "color": "green", "xray": "1" }
+    },
+    { "type": "wokwi-logic-analyzer", "id": "logic1", "top": -182.05, "left": 19.2, "attrs": {} },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": -82.45,
+      "left": 432,
+      "attrs": { "value": "220" }
+    }
+  ],
+  "connections": [
+    [ "esp32:18", "$serialMonitor:TX", "green", [] ],
+    [ "esp32:17", "$serialMonitor:RX", "green", [] ],
+    [ "btn1:1.r", "esp32:7", "blue", [ "h38.6", "v19.2" ] ],
+    [ "btn1:2.r", "esp32:GND.1", "black", [ "h0.2", "v105.8" ] ],
+    [ "logic1:GND", "esp32:GND.1", "black", [ "h-9.6", "v259.2" ] ],
+    [ "esp32:GND.2", "led1:C", "black", [ "h106" ] ],
+    [ "esp32:6", "r1:1", "green", [ "h-19.25", "v-86.4" ] ],
+    [ "r1:2", "led1:A", "green", [ "v0" ] ],
+    [ "esp32:17", "logic1:D0", "violet", [ "h-316.85", "v-220.8" ] ]
+  ],
+  "dependencies": {}
+}
