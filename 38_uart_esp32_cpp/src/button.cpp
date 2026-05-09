@@ -1,7 +1,9 @@
 #include "button.h"
 #include "driver/gpio.h"
 #include "config.h"
-#include "esp_attr.h"
+#include "time_utils.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 static void IRAM_ATTR gpio_isr_handler(void *arg)
 {
@@ -9,27 +11,26 @@ static void IRAM_ATTR gpio_isr_handler(void *arg)
     button->set_is_triggered_flag();
 }
 
-Button::Button(const gpio_num_t gpio_num) : gpio_num(gpio_num)
+Button::Button(const gpio_num_t gpio_num) : _gpio_num(gpio_num)
 {
     is_triggered_flag = false;
 };
 
 Button::~Button()
 {
-    reset_is_triggered_flag();
-    gpio_reset_pin(gpio_num);
+    gpio_reset_pin(_gpio_num);
     gpio_uninstall_isr_service();
 }
 
 void Button::init()
 {
-    gpio_reset_pin(gpio_num);
-    gpio_set_direction(gpio_num, GPIO_MODE_INPUT);
-    gpio_set_pull_mode(gpio_num, GPIO_PULLUP_ONLY);
-    gpio_set_intr_type(gpio_num, GPIO_INTR_NEGEDGE);
+    gpio_reset_pin(_gpio_num);
+    gpio_set_direction(_gpio_num, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(_gpio_num, GPIO_PULLUP_ONLY);
+    gpio_set_intr_type(_gpio_num, GPIO_INTR_NEGEDGE);
 
     gpio_install_isr_service(Config::Button::ESP_INTR_FLAG_DEFAULT);
-    gpio_isr_handler_add(gpio_num, gpio_isr_handler, (void *)this);
+    gpio_isr_handler_add(_gpio_num, gpio_isr_handler, (void *)this);
 }
 
 IRAM_ATTR void Button::set_is_triggered_flag()

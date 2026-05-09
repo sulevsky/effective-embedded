@@ -5,7 +5,7 @@
 class Button
 {
 private:
-    const gpio_num_t gpio_num;
+    const gpio_num_t _gpio_num;
     volatile bool is_triggered_flag;
 
 public:

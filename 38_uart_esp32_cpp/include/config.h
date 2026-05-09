@@ -21,8 +21,13 @@ namespace Config
 
     namespace Button
     {
-        static const gpio_num_t BUTTON_GPIO = GPIO_NUM_10;
+        static const gpio_num_t BUTTON_GPIO = GPIO_NUM_4;
         static const int ESP_INTR_FLAG_DEFAULT = 0;
+        static const uint32_t DEFAULT_DEBOUNCE_DELAY_MICROS = 100000;
+    };
+    namespace Led
+    {
+        static const gpio_num_t LED_GPIO = GPIO_NUM_5;
     };
     namespace Encoder
     {
