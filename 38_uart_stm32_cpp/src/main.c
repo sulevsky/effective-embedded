@@ -24,8 +24,8 @@
 #include <stdio.h>
 #include "time_hal.h"
 #include "time_utils.h"
-#include "servo_utils.h"
 #include "config.h"
+#include "led.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -106,6 +106,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
   uint8_t transmit[1] = {'x'};
   uint32_t last_button_check = 0;
   while (1)
@@ -116,9 +117,10 @@ int main(void)
     {
       HAL_StatusTypeDef send_status = HAL_UART_Transmit(&huart1, transmit, 1, 100);
       last_button_check = now;
+      toggle_local_led();
       printf("send status: %d\n", send_status);
     }
-
+    
     uint8_t receive_buffer[1] = {};
     HAL_StatusTypeDef status = HAL_UART_Receive(&huart1, receive_buffer, 1, 10);
     if (status == HAL_OK)
@@ -127,7 +129,7 @@ int main(void)
       printf("receive status: %d, data: %d\n", status, data);
       if (data)
       {
-        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+        toggle_remote_led();
       }
     }
     /* USER CODE BEGIN 3 */

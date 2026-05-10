@@ -1,4 +1,9 @@
 #pragma once
 
 #define DELAY_MILLIS 10
-#define ADC_POLL_TIMEOUT_MILLIS 1
+
+
+#define LOCAL_LED_PORT GPIOA
+#define LOCAL_LED_PIN GPIO_PIN_8
+#define REMOTE_LED_PORT GPIOA
+#define REMOTE_LED_PIN GPIO_PIN_5
