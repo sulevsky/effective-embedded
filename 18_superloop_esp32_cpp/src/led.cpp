@@ -1,32 +1,35 @@
 #include "driver/gpio.h"
 #include "config.h"
 #include "led.h"
+#include "time_utils.h"
 
-uint32_t Led::to_level(LedState led_state)
+uint32_t Led::to_level(const State led_state)
 {
     switch (led_state)
     {
-    case OFF:
-        return CommonConfig::LEVEL_LOW;
-    case ON:
-        return CommonConfig::LEVEL_HIGH;
+    case State::OFF:
+        return Config::Common::LEVEL_LOW;
+    case State::ON:
+        return Config::Common::LEVEL_HIGH;
     default:
         __builtin_unreachable();
     }
 }
 
-Led::Led(gpio_num_t gpio_num, LedState initial_led_state)
+Led::Led(const gpio_num_t gpio_num, const State initial_led_state, const uint32_t period_millis) : _gpio_num(gpio_num), _period_millis(period_millis)
 {
-    _gpio_num = gpio_num;
     _level = to_level(initial_led_state);
+    _last_toggle = 0;
 }
+
 void Led::init()
 {
     gpio_reset_pin(_gpio_num);
     gpio_set_direction(_gpio_num, GPIO_MODE_OUTPUT);
     gpio_set_level(_gpio_num, _level);
 }
-void Led::set_state(LedState led_state)
+
+void Led::set_state(const State led_state)
 {
     uint32_t gpio_level = to_level(led_state);
 
@@ -36,16 +39,21 @@ void Led::set_state(LedState led_state)
         gpio_set_level(_gpio_num, gpio_level);
     }
 }
-void Led::toggle()
+void Led::toggle_if_expired(uint32_t now)
 {
-    uint32_t new_level;
-    if (_level == CommonConfig::LEVEL_LOW)
+    if (!is_expired(now, _last_toggle, _period_millis))
     {
-        _level = CommonConfig::LEVEL_HIGH;
+        return;
     }
-    else if (_level == CommonConfig::LEVEL_HIGH)
+    _last_toggle  = now;
+    uint32_t new_level;
+    if (_level == Config::Common::LEVEL_LOW)
     {
-        _level = CommonConfig::LEVEL_LOW;
+        _level = Config::Common::LEVEL_HIGH;
+    }
+    else if (_level == Config::Common::LEVEL_HIGH)
+    {
+        _level = Config::Common::LEVEL_LOW;
     }
     else
     {
