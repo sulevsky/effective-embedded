@@ -39,6 +39,5 @@ void solution_interrupt_debounce_state()
     }
 
     printf("Number of presses: %ld\n", counter);
-    button.~Button();
     printf("Experiment 3 - finished\n\n");
 }

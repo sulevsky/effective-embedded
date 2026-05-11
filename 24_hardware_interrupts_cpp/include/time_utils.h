@@ -3,6 +3,7 @@
 #include "stdint.h"
 #include "freertos/FreeRTOS.h"
 #include "esp_timer.h"
+#include "config.h"
 
 inline bool is_expired(const uint32_t now, const uint32_t last_event, const uint32_t timeout)
 {
@@ -11,8 +12,7 @@ inline bool is_expired(const uint32_t now, const uint32_t last_event, const uint
 
 inline uint32_t now_millis()
 {
-
-    return (uint32_t)(esp_timer_get_time() / Config::Common::MILLIS_IN_SECONDS);
+    return (uint32_t)(esp_timer_get_time() / Config::Common::MICROS_IN_MILLIS);
 }
 
 inline uint64_t now_micros()

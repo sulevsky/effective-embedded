@@ -33,6 +33,5 @@ void solution_interrupt_debounce_time()
     }
 
     printf("Number of interrupts: %ld\n", counter);
-    button.~Button();
     printf("Experiment 2 - finished\n\n");
 }

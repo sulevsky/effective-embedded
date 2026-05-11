@@ -7,6 +7,10 @@
 
 static void IRAM_ATTR gpio_isr_handler(void *arg)
 {
+    if (arg == nullptr)
+    {
+        return;
+    }
     Button *button = (Button *)arg;
     button->increment_counter();
     button->set_is_triggered_flag();

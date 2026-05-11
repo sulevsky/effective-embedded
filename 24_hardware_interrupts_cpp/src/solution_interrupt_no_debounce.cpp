@@ -22,6 +22,5 @@ void solution_interrupt_no_debounce()
     }
 
     printf("Number of interrupts: %ld\n", button.get_counter());
-    button.~Button();
     printf("Experiment 1: No debounce - finished\n\n");
 }
