@@ -1,0 +1,20 @@
+[tools]
+# rust = "latest"
+# 
+[env]
+PLATFORM = "esp32-s3-devkitm-1"
+
+[tasks.build]
+alias = "b"
+run = "platformio run --environment $PLATFORM"
+
+[tasks.flash]
+alias = "f"
+run = "platformio run --target upload --environment $PLATFORM"
+
+[tasks.flash-monitor]
+alias = "fm"
+run = "platformio run --target upload --target monitor --environment $PLATFORM"
+
+[tasks.test]
+run = "platformio test -e native -v"
