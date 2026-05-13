@@ -1,11 +1,11 @@
-use stm32f4xx_hal::gpio::{AnyPin, Output, Pin};
+use embedded_hal::digital::StatefulOutputPin;
 
-pub struct Led {
-    output: AnyPin<Output>,
+pub struct Led<PIN> {
+    output: PIN,
 }
 
-impl Led {
-    pub fn new(output: AnyPin<Output>) -> Self {
+impl<PIN: StatefulOutputPin> Led<PIN> {
+    pub fn new(output: PIN) -> Self {
         Self { output }
     }
     pub fn on(&mut self) {
