@@ -26,3 +26,8 @@ vcomh (0xDB, value)
 charge pump / regulator enable (якщо є; у SSD1306 це 0x8D, 0x14)
 Display ON (0xAF)
 Опційно: намалювати блок-схему.
+
+# TODO
+- display prints digits only
+- BME reads temp only
+- exteranl clock is not connected
