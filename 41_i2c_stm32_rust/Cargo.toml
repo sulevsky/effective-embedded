@@ -22,8 +22,10 @@ defmt = "1.1.0"
 critical-section = "1.2.0"
 
 ssd1306 = "0.10.0"
+static_cell = "*"
 
 [[bin]]
 name = "blinky_esp_rust"
 test = false
 bench = false
+debug = true

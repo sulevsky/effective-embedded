@@ -1,43 +1,53 @@
 #![no_std]
 #![no_main]
 
-mod led;
+// mod led;
 // mod ssd1306;
-// mod bm280;
+mod bme280;
+
+use core::cell::RefCell;
 
 use cortex_m::delay::Delay;
 use defmt::info;
 
 use defmt_rtt as _;
 use panic_probe as _;
-use ssd1306::mode::DisplayConfig;
-use ssd1306::rotation::DisplayRotation;
-use ssd1306::size::DisplaySize128x64;
-use ssd1306::{I2CDisplayInterface, Ssd1306};
-use stm32f1xx_hal::gpio::GpioExt;
-use stm32f1xx_hal::pac;
-use stm32f1xx_hal::rcc::RccExt;
+use stm32f4xx_hal::{
+    gpio::GpioExt,
+    i2c::{I2cExt, Mode},
+    prelude::*,
+    serial,
+};
 
-use crate::led::Led;
+use crate::bme280::UncalibratedSensor;
+
+// use ssd1306::mode::DisplayConfig;
+// use ssd1306::rotation::DisplayRotation;
+// use ssd1306::size::DisplaySize128x64;
+// use ssd1306::{I2CDisplayInterface, Ssd1306};
+// use stm32f1xx_hal::gpio::GpioExt;
+// use stm32f1xx_hal::pac;
+// use stm32f1xx_hal::rcc::RccExt;
+
+// use crate::led::Led;
 
 #[cortex_m_rt::entry]
 fn main() -> ! {
-    info!("Init...");
+    info!("Starting initialization");
     let cp = cortex_m::Peripherals::take().unwrap();
-    let dp = pac::Peripherals::take().unwrap();
+    let dp = stm32f4xx_hal::pac::Peripherals::take().unwrap();
+    let mut rcc = dp.RCC.constrain();
+    let gpioa = dp.GPIOA.split(&mut rcc);
+    let gpiob = dp.GPIOB.split(&mut rcc);
+    let mut internal_led = gpioa.pa5.into_push_pull_output();
 
-    // let mut rcc = dp.RCC.constrain();
-    // let gpioa = dp.GPIOA.split(&mut rcc);
-    // let gpiob = dp.GPIOB.split(&mut rcc);
+    let mut delay = Delay::new(cp.SYST, rcc.clocks.sysclk().raw());
 
-    // let mut delay = Delay::new(cp.SYST, rcc.clocks.sysclk().raw());
-    // let mut remote_led = Led::new(gpioa.pa5.into_push_pull_output().erase());
-    // let mut local_led = Led::new(gpioa.pa8.into_push_pull_output().erase());
-
-    // let mut i2c = dp
-    //     .I2C1
-    //     .i2c((gpiob.pb6, gpiob.pb7), Mode::from(100.kHz()), &mut rcc);
-
+    let i2c = dp
+        .I2C1
+        .i2c((gpiob.pb6, gpiob.pb7), Mode::standard(100.kHz()), &mut rcc);
+    let i2c_cell = &RefCell::new(i2c);
+    let mut baro_sensor = UncalibratedSensor::new(i2c_cell).calibrate(0);
     // let mut display = Display::new(i2c);
     // display.exec();
     // let interface = I2CDisplayInterface::new(i2c);
@@ -76,10 +86,19 @@ fn main() -> ! {
 
     // i2c.write(display_addr, &[control_register_addr, 0xA4])
     //     .unwrap();
+    info!("Finished initialization");
+    info!("Running");
     loop {
-        // i2c.write_read(display_addr, &register_addr, &mut buf)
-        //     .unwrap();
-        info!("Read");
-        // delay.delay_ms(500);
+        info!("---------------tick");
+        let sensor_data = baro_sensor.read_sensor();
+        info!("temp");
+        info!("{}", sensor_data.temperature as f64 / 100.0);
+        // info!("pressure");
+        // info!("{}", sensor_data.pressure);
+
+        internal_led.set_high();
+        delay.delay_ms(500);
+        internal_led.set_low();
+        delay.delay_ms(500);
     }
 }
