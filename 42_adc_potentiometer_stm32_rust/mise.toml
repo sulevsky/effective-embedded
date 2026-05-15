@@ -1,0 +1,18 @@
+[tools]
+# rust = "latest"
+
+[env]
+DEFMT_LOG = "trace"
+
+[tasks.run]
+run = "cargo run"
+
+[tasks.build]
+alias = "b"
+run = "cargo build"
+
+
+[tasks.flash-monitor]
+depends = "build"
+alias = "fm"
+run = "probe-rs run --chip STM32F446RE target/thumbv7em-none-eabihf/debug/blinky_esp_rust"
