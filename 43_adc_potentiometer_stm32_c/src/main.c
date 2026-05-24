@@ -107,6 +107,10 @@ int main(void)
   /* Infinite loop */
   uint32_t last_now = now_millis();
   /* USER CODE BEGIN WHILE */
+  // uart logging delay
+  delay(3000);
+  // csv header
+  printf("raw,measured_voltage\r\n");
   while (1)
   {
     if (!is_expired(now_millis(), last_now, DELAY_MILLIS))
@@ -117,7 +121,8 @@ int main(void)
     HAL_ADC_PollForConversion(&hadc1, ADC_POLL_TIMEOUT_MILLIS);
     uint32_t adc_value = HAL_ADC_GetValue(&hadc1);
     uint32_t voltage = __LL_ADC_CALC_DATA_TO_VOLTAGE(3300, adc_value, LL_ADC_RESOLUTION_12B);
-    printf("raw adc: %4ld, voltage: %4ld\r\n", adc_value, voltage);
+    // raw,measured_voltage
+    printf("%ld,%ld\r\n", adc_value, voltage);
     last_now = now_millis();
   }
 }
