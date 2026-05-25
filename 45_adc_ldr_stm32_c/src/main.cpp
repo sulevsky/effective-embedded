@@ -47,7 +47,7 @@ int main(void)
   Led led(led_gpio);
 
   Ldr ldr(&hadc1);
-  SmaFilter sma_filter(SMA_FILTER_SWITCH_THRESHOLD, SMA_FILTER_HYSTERESYS_RANGE);
+  SmaFilter sma_filter(SMA_FILTER_SWITCH_THRESHOLD, SMA_FILTER_HYSTERESIS_RANGE);
 
   uint32_t last_sampled = now_millis();
   uint32_t last_led_updated = now_millis();

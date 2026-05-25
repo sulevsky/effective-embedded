@@ -3,7 +3,7 @@
 #include "config.h"
 #include <cassert>
 
-SmaFilter::SmaFilter(const uint32_t switch_theshold, const uint32_t hysteresys_range) : buffer{}, switch_theshold(switch_theshold), hysteresys_range(hysteresys_range)
+SmaFilter::SmaFilter(const uint32_t switch_theshold, const uint32_t hysteresis_range) : buffer{}, switch_theshold(switch_theshold), hysteresis_range(hysteresis_range)
 {
     is_initialized = false;
     current_index = 0;
@@ -42,7 +42,7 @@ uint16_t SmaFilter::calculate_average()
 bool SmaFilter::is_on()
 {
     uint16_t average = calculate_average();
-    bool is_unknown = (average > (switch_theshold - hysteresys_range)) && (average < (switch_theshold + hysteresys_range));
+    bool is_unknown = (average > (switch_theshold - hysteresis_range)) && (average < (switch_theshold + hysteresis_range));
     if (!is_unknown)
     {
         current_state_is_on = average < switch_theshold;
