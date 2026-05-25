@@ -25,6 +25,9 @@
 #include "time_hal.h"
 #include "time_utils.h"
 #include "config.h"
+#include "led.h"
+#include "ldr.h"
+#include "sma_filter.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,11 +65,13 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-int _write(int file, char *ptr, int len)
+#ifdef DEBUG
+extern "C" int _write(int file, char *ptr, int len)
 {
   HAL_UART_Transmit(&huart2, (uint8_t *)ptr, len, HAL_MAX_DELAY);
   return len;
 }
+#endif
 /* USER CODE END 0 */
 
 /**
@@ -101,33 +106,44 @@ int main(void)
   MX_ADC1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
-  /* USER CODE END 2 */
-
   uint32_t last_now = now_millis();
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
   // uart logging delay
   delay(3000);
-  // csv header
-  printf("raw,measured_voltage\r\n");
-  int i = 0;
+  printf("init..\r\n");
+
+  Gpio led_gpio = Gpio{
+      LED_GPIO_PORT,
+      LED_GPIO_PIN,
+  };
+  Led led(led_gpio);
+
+  Ldr ldr(&hadc1);
+  SmaFilter sma_filter(SMA_FILTER_SWITCH_THRESHOLD, SMA_FILTER_HYSTERESYS_RANGE);
+
+  uint32_t last_sampled = now_millis();
+  uint32_t last_led_updated = now_millis();
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
   while (1)
   {
-    if (!is_expired(now_millis(), last_now, DELAY_MILLIS))
+    if (is_expired(now_millis(), last_sampled, SAMPLING_DELAY_MILLIS))
     {
-      continue;
+      uint16_t sample = ldr.read_calibrated();
+      uint16_t reversed_sample = ldr.reverse_value(sample);
+      sma_filter.process_new_sample(reversed_sample);
+      last_sampled = now_millis();
+#ifdef DEBUG
+      printf("adc raw %d\r\n", sample);
+#endif
     }
-    TIM1->CCR2 = i%4096;
-    i+=50;
-    printf("i %d\r\n", i);
-    HAL_ADC_Start(&hadc1);
-    HAL_ADC_PollForConversion(&hadc1, ADC_POLL_TIMEOUT_MILLIS);
-    uint32_t adc_value = HAL_ADC_GetValue(&hadc1);
-    uint32_t voltage = __LL_ADC_CALC_DATA_TO_VOLTAGE(3300, adc_value, LL_ADC_RESOLUTION_12B);
-    printf("adc %d\r\n", adc_value);
-    last_now = now_millis();
-    HAL_GPIO_TogglePin(GPIOA, LD2_Pin);
+    if (is_expired(now_millis(), last_led_updated, LED_UPDATE_DELAY_MILLIS))
+    {
+      bool is_on = sma_filter.is_on();
+      led.set_state(is_on);
+      last_led_updated = now_millis();
+    }
   }
 }
 

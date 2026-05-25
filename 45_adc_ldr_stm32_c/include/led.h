@@ -1,12 +1,14 @@
 #pragma once
+
 #include "stdint.h"
+#include "gpio.h"
 
 class Led
 {
 private:
-    static const uint32_t FREQUENCY_HZ = 5000;
+    const Gpio gpio;
 
 public:
-    Led();
-    void set_state(uint16_t state);
+    Led(const Gpio gpio);
+    void set_state(bool is_off);
 };
