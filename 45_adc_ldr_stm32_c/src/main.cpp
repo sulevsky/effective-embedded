@@ -34,8 +34,6 @@ int main(void)
   MX_ADC1_Init();
   MX_USART2_UART_Init();
 
-  uint32_t last_now = now_millis();
-
   // uart logging delay
   delay(3000);
   printf("init..\r\n");
