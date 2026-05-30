@@ -1,0 +1,26 @@
+[package]
+name = "blinky_esp_rust"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+cortex-m = { version = "0.7.7", features = [
+    "inline-asm",
+    "critical-section-single-core",
+] }
+cortex-m-rt = "0.7.3"
+
+panic-probe = { version = "1.0.0", features = ["print-defmt"] }
+
+embedded-hal = "1.0"
+stm32f4xx-hal = { version = "0.23.0", features = ["stm32f446", "defmt"] }
+
+defmt-rtt = "1.2.0"
+defmt = "1.1.0"
+
+critical-section = "1.2.0"
+
+static_cell = "2.1.1"
+fugit = { version = "0.3.9", features = ["defmt"] }
+libm = "0.2.16"
+
