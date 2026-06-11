@@ -1,11 +1,8 @@
 #include <stdint.h>
 #include <freertos/FreeRTOS.h>
-#include <ldr.h>
-#include <servo.h>
-#include <config.h>
-
-#define SERVO_PERIOD_MS 1000 / SERVO_FREQ
-#define SERVO_MAX_DUTY ((1 << SERVO_RESOLUTION) - 1)
+#include "ldr.h"
+#include "servo.h"
+#include "config.h"
 
 extern "C" void app_main(void)
 {
