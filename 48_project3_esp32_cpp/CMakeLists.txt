@@ -1,3 +1,3 @@
 cmake_minimum_required(VERSION 3.16.0)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-project(44_adc_potentiometer_calibration_esp32_c)
+project(48_project3_esp32_cpp)
