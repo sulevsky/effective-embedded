@@ -1,0 +1,31 @@
+[tools]
+# rust = "latest"
+
+[env]
+DEFMT_LOG = "debug"
+INIT_DATE_TIME = "2015-09-18T23:56:04"
+CLEAR_MEMORY = false
+CREATE_DEMO_DATA = false
+PRINT_REPORT = false
+COLLECT_NEW_DATA = false
+SEND_DEMO_BATCHES_NUM = 1
+SHOULD_SEND_MEASUREMENTS = false
+
+[tasks.run]
+run = "cargo run"
+
+[tasks.build]
+alias = "b"
+run = "cargo build"
+
+[tasks.test]
+alias = "t"
+run = "cargo test --target aarch64-apple-darwin entry"
+
+[tasks.flash-monitor]
+depends = "build"
+alias = "fm"
+run = "probe-rs run --chip STM32F446RE target/thumbv7em-none-eabihf/debug/blinky_esp_rust"
+
+[tasks.default]
+depends = ["flash-monitor"]
