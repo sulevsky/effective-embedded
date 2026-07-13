@@ -3,16 +3,18 @@
 
 mod adc;
 mod clock;
-mod entry;
 mod memory;
 mod spi_sender;
+mod utils;
 
+use crate::utils::{parse_bool, parse_u32};
 use chrono::NaiveDateTime;
 use cortex_m::delay::Delay;
 use defmt::{debug, info};
-
 use defmt_rtt as _;
+use messages::entry;
 use panic_probe as _;
+use stm32f4xx_hal::gpio::PinState;
 use stm32f4xx_hal::{
     gpio::GpioExt,
     i2c::{I2cExt, Mode},
@@ -27,16 +29,6 @@ const COLLECT_NEW_DATA: bool = parse_bool(option_env!("COLLECT_NEW_DATA"));
 const SEND_DEMO_BATCHES_NUM: Option<&str> = option_env!("SEND_DEMO_BATCHES_NUM");
 const SHOULD_SEND_MEASUREMENTS: bool = parse_bool(option_env!("SHOULD_SEND_MEASUREMENTS"));
 
-const fn parse_bool(input: Option<&str>) -> bool {
-    if let Some(inp) = input {
-        return matches!(inp.as_bytes(), b"true");
-    }
-    false
-}
-fn parse_u32(input: Option<&str>) -> u32 {
-    input.map(|s| s.parse::<u32>().unwrap_or(0)).unwrap_or(0)
-}
-
 #[cortex_m_rt::entry]
 fn main() -> ! {
     info!("Starting initialization");
@@ -46,6 +38,7 @@ fn main() -> ! {
     let gpioa = dp.GPIOA.split(&mut rcc);
     let gpiob = dp.GPIOB.split(&mut rcc);
     let gpioc = dp.GPIOC.split(&mut rcc);
+    let mut internal_led = gpioa.pa5.into_push_pull_output();
     let mut delay = Delay::new(cp.SYST, rcc.clocks.sysclk().raw());
 
     info!("Initializing ADC");
@@ -86,6 +79,7 @@ fn main() -> ! {
     let sck = gpiob.pb10;
     let miso = gpioc.pc2;
     let mosi = gpioc.pc1;
+    let mut cs = gpiob.pb4.into_push_pull_output_in_state(PinState::High);
     let mut spi_bus = stm32f4xx_hal::spi::Spi::new(
         dp.SPI2,
         (Some(sck), Some(miso), Some(mosi)),
@@ -118,11 +112,13 @@ fn main() -> ! {
         );
         create_demo_entries()
             .iter()
-            .for_each(|entry| spi_sender.send(&mut spi_bus, entry));
+            .for_each(|entry| spi_sender.send(&mut spi_bus, &mut cs, entry));
         info!("Finished sending batch, wait 1 sec");
+        internal_led.toggle();
         delay.delay_ms(1000);
+
     }
-    info!("Sending demo data is finshed");
+    info!("Sending demo data is finished");
 
     info!("Processing report");
     info!("Should print report set to {}", PRINT_REPORT);
@@ -149,7 +145,7 @@ fn main() -> ! {
     info!("Collect new data");
     info!("Collect new data is set to {}", COLLECT_NEW_DATA);
     if COLLECT_NEW_DATA {
-        info!("Sarting collecting new data");
+        info!("Starting collecting new data");
         loop {
             let adc_value = adc.measure();
             let now = clock.read(&mut i2c);
@@ -159,13 +155,15 @@ fn main() -> ! {
                 adc_value
             );
             memory.write_next(&mut i2c, &entry::LogEntry::new(now, adc_value));
+            internal_led.toggle();
             delay.delay_ms(1000);
         }
     } else {
         info!("Collecting new data is disabled");
         info!("Finished");
         loop {
-            delay.delay_ms(10000);
+            internal_led.toggle();
+            delay.delay_ms(5000);
         }
     }
 }

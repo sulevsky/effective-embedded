@@ -1,6 +1,8 @@
 use defmt::{error, trace, warn};
+use messages::entry;
 
-use crate::entry::{self, log_warn};
+use crate::utils::log_warn;
+
 
 const MEMORY_ADDR: u8 = 0x50;
 const START_ADDR: u16 = 0x0000;

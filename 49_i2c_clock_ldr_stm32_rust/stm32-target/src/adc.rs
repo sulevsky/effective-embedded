@@ -1,5 +1,3 @@
-use defmt_rtt as _;
-use panic_probe as _;
 use stm32f4xx_hal::{adc::config::AdcConfig, gpio::Analog};
 
 pub struct Adc {

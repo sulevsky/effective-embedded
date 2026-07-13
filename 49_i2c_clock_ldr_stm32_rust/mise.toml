@@ -8,7 +8,7 @@ CLEAR_MEMORY = false
 CREATE_DEMO_DATA = false
 PRINT_REPORT = false
 COLLECT_NEW_DATA = false
-SEND_DEMO_BATCHES_NUM = 1
+SEND_DEMO_BATCHES_NUM = 10000
 SHOULD_SEND_MEASUREMENTS = false
 
 [tasks.run]
@@ -20,12 +20,13 @@ run = "cargo build"
 
 [tasks.test]
 alias = "t"
-run = "cargo test --target aarch64-apple-darwin entry"
+run = "cargo test"
 
-[tasks.flash-monitor]
-depends = "build"
-alias = "fm"
-run = "probe-rs run --chip STM32F446RE target/thumbv7em-none-eabihf/debug/blinky_esp_rust"
+[tasks.flash-monitor-stm]
+alias = "fms"
+run = "(cd stm32-target && cargo run)"
 
-[tasks.default]
-depends = ["flash-monitor"]
+[tasks.flash-monitor-esp]
+alias = "fme"
+run = "(cd esp32-target && cargo run)"
+

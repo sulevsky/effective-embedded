@@ -1,9 +1,8 @@
 use chrono::{DateTime, NaiveDateTime};
-use defmt::warn;
 
 pub const SERIALIZED_LOG_ENTRY_SIZE: usize = 10;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug, Default)]
 pub struct LogEntry {
     datetime: NaiveDateTime,
     value: u16,
@@ -22,7 +21,7 @@ impl LogEntry {
     pub fn deserialize(serialized: &[u8; SERIALIZED_LOG_ENTRY_SIZE]) -> LogEntry {
         let time_part: [u8; 8] = serialized[0..8].try_into().unwrap();
         let datetime = DateTime::from_timestamp_secs(i64::from_le_bytes(time_part))
-            .unwrap_or_default()
+            .unwrap()
             .naive_utc();
 
         let value_part: [u8; 2] = serialized[8..].try_into().unwrap();
@@ -39,11 +38,22 @@ impl LogEntry {
         packed
     }
 }
-pub fn log_warn(message: &str, log_entry: &LogEntry) {
-    warn!(
-        "{} {} {}",
-        message,
-        defmt::Display2Format(&log_entry.datetime()),
-        log_entry.value()
-    );
+
+#[cfg(test)]
+mod tests {
+
+    extern crate std;
+    use std::prelude::v1::*;
+
+    use super::*;
+    #[test]
+    fn serialize_and_deserialize() {
+        let datetime = "2015-09-18T23:56:10".parse::<NaiveDateTime>().unwrap();
+        let original = LogEntry::new(datetime, 42);
+
+        let serialized = original.serialize();
+        let deserialized = LogEntry::deserialize(&serialized);
+
+        assert_eq!(original, deserialized);
+    }
 }

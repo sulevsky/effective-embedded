@@ -19,5 +19,5 @@
 + save adc + clock into memory
 + read adc + clock from memory
 + send with SPI 
-- workspaces
-- receive with SPI and print (esp)
++ workspaces
++ receive with SPI and print (esp)
