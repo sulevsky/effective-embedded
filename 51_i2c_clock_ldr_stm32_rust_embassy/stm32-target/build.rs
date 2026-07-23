@@ -5,6 +5,4 @@ fn main() {
 
     // add stm32-target dir for linker search to find memory.x
     println!("cargo::rustc-link-search=stm32-target");
-
-    println!("cargo::rerun-if-changed=../mise.toml");
 }

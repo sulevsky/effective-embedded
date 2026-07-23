@@ -1,16 +1,15 @@
 use defmt::{error, trace, warn};
+use embassy_stm32::i2c::{I2c, Master};
 use messages::entry;
 
 use crate::utils::log_warn;
-
 
 const MEMORY_ADDR: u8 = 0x50;
 const START_ADDR: u16 = 0x0000;
 const END_ADDR: u16 = 0x0FFF;
 const MAX_RETRIES: u8 = 5;
 
-// TODO overflow is not handled
-
+// [TODO] overflow is not handled
 #[derive(Debug, defmt::Format)]
 pub struct Memory {
     is_full: bool,
@@ -18,10 +17,11 @@ pub struct Memory {
 }
 
 impl Memory {
-    pub fn new<T: embedded_hal::i2c::I2c>(i2c: &mut T) -> Memory {
+    pub async fn new<T: embedded_hal_async::i2c::I2c>(i2c: &mut T) -> Memory {
         let mut buf = [0u8; 2];
-        ensure_bus_available(i2c);
+        ensure_bus_available(i2c).await;
         i2c.write_read(MEMORY_ADDR, &[0x00, 0x00], &mut buf)
+            .await
             .unwrap();
         let is_full = (buf[0] & 0x80) != 0;
         let mut next_address = (((buf[0] & 0x7F) as u16) << 8) | buf[1] as u16;
@@ -33,17 +33,17 @@ impl Memory {
             next_address,
         }
     }
-    pub fn clear<T: embedded_hal::i2c::I2c>(&mut self, i2c: &mut T) {
+    pub async fn clear<T: embedded_hal_async::i2c::I2c>(&mut self, i2c: &mut T) {
         let mut pointer = [0u8; 4];
         pointer[2..4].copy_from_slice(&(2u16.to_be_bytes()));
-        ensure_bus_available(i2c);
-        i2c.write(MEMORY_ADDR, &pointer).unwrap();
+        ensure_bus_available(i2c).await;
+        i2c.write(MEMORY_ADDR, &pointer).await.unwrap();
         self.is_full = false;
         self.next_address = 2;
     }
 
-    // TODO vova reworked to by byte save due to page issues, consider rework
-    pub fn write_next<T: embedded_hal::i2c::I2c>(
+    // TODO reworked to by byte save due to page issues, consider rework
+    pub async fn write_next<T: embedded_hal_async::i2c::I2c>(
         &mut self,
         i2c: &mut T,
         log_entry: &entry::LogEntry,
@@ -52,14 +52,14 @@ impl Memory {
         let mut buf = [0u8; 3];
         for try_num in 1..=MAX_RETRIES {
             for b in 0..entry::SERIALIZED_LOG_ENTRY_SIZE {
-                ensure_bus_available(i2c);
+                ensure_bus_available(i2c).await;
                 let memory_address = (self.next_address + b as u16).to_be_bytes();
 
                 buf[0..2].copy_from_slice(&memory_address);
                 buf[2] = serialized_entry[b];
-                i2c.write(MEMORY_ADDR, &buf).unwrap();
+                i2c.write(MEMORY_ADDR, &buf).await.unwrap();
             }
-            let log_entry_after_save = self.read(i2c, self.next_address);
+            let log_entry_after_save = self.read(i2c, self.next_address).await;
             if log_entry != &log_entry_after_save {
                 warn!(
                     "Entry was not properly saved, retrying, retry {} of {}",
@@ -78,8 +78,8 @@ impl Memory {
         self.next_address = next_state.next_address;
         let mut pointer = [0u8; 4];
         pointer[2..4].copy_from_slice(&self.next_address.to_be_bytes());
-        ensure_bus_available(i2c);
-        i2c.write(MEMORY_ADDR, &pointer).unwrap();
+        ensure_bus_available(i2c).await;
+        i2c.write(MEMORY_ADDR, &pointer).await.unwrap();
     }
 
     fn calculate_next_state(&self) -> Memory {
@@ -109,7 +109,7 @@ impl Memory {
         }
     }
 
-    pub fn read_all<T: embedded_hal::i2c::I2c>(
+    pub async fn read_all<T: embedded_hal_async::i2c::I2c>(
         &self,
         i2c: &mut T,
         buf: &mut [Option<entry::LogEntry>],
@@ -130,17 +130,19 @@ impl Memory {
             let mut entry_buf = [0u8; 10];
             let mut entry_memory_address = [0u8; 2];
             entry_memory_address.copy_from_slice(&i.to_be_bytes());
-            ensure_bus_available(i2c);
+            ensure_bus_available(i2c).await;
             i2c.write_read(MEMORY_ADDR, &entry_memory_address, &mut entry_buf)
+                .await
                 .unwrap();
             let entry = entry::LogEntry::deserialize(&entry_buf);
-            warn!("{} {}", el_num, &entry_buf);
+            trace!("{} {}", el_num, &entry_buf);
             buf[el_num].replace(entry);
             el_num += 1;
         }
         Ok(())
     }
-    pub fn read<T: embedded_hal::i2c::I2c>(
+
+    pub async fn read<T: embedded_hal_async::i2c::I2c>(
         &self,
         i2c: &mut T,
         memory_address: u16,
@@ -148,15 +150,18 @@ impl Memory {
         let mut entry_memory_address = [0u8; 2];
         entry_memory_address.copy_from_slice(&memory_address.to_be_bytes());
         let mut entry_buf = [0u8; 10];
-        ensure_bus_available(i2c);
+        ensure_bus_available(i2c).await;
         i2c.write_read(MEMORY_ADDR, &entry_memory_address, &mut entry_buf)
+            .await
             .unwrap();
         entry::LogEntry::deserialize(&entry_buf)
     }
 }
 
-fn ensure_bus_available<T: embedded_hal::i2c::I2c>(i2c: &mut T) {
-    while i2c.write(MEMORY_ADDR, &[]).is_err() {
-        trace!("I2C bus is not available, retrying");
-    }
+async fn ensure_bus_available<T: embedded_hal_async::i2c::I2c>(_i2c: &mut T) {
+    // [TODO] works ok with blocking, panics with embassy
+    // `[ERROR] panicked at 'assertion failed: mem_len > 0 && mem_len <= 0xFFFF'`
+    // while i2c.write(MEMORY_ADDR, &[]).await.is_err() {
+    //     trace!("I2C bus is not available, retrying");
+    // }
 }
