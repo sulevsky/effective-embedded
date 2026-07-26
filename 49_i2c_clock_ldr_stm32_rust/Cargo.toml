@@ -1,0 +1,3 @@
+[workspace]
+members = ["stm32-target", "esp32-target", "messages"]
+resolver = "3"

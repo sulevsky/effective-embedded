@@ -1,0 +1,35 @@
+[tools]
+# rust = "latest"
+
+[env]
+DEFMT_LOG = "info"
+INIT_DATE_TIME = "2020-09-18T23:56:04"
+CLEAR_MEMORY = false
+CREATE_DEMO_DATA = false
+PRINT_REPORT = true
+COLLECT_NEW_DATA = true
+SEND_DEMO_BATCHES_NUM = 1
+SHOULD_SEND_MEASUREMENTS = true
+
+[tasks.run]
+run = "cargo run"
+
+[tasks.build]
+alias = "b"
+run = "cargo build"
+
+[tasks.test]
+alias = "t"
+run = "cargo test"
+
+[tasks."stm:flash-monitor"]
+alias = "fms"
+run = "(cd stm32-target && cargo run)"
+
+[tasks."stm:erase"]
+alias = "erase"
+run = "(cd stm32-target && probe-rs erase --chip STM32F446RE --connect-under-reset)"
+
+[tasks.flash-monitor-esp]
+alias = "fme"
+run = "(cd esp32-target && cargo run)"
