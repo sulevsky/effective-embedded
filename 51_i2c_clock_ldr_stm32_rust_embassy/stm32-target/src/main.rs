@@ -34,10 +34,9 @@ bind_interrupts!(
     DMA1_STREAM6 => dma::InterruptHandler<peripherals::DMA1_CH6>;
     DMA1_STREAM4 => dma::InterruptHandler<peripherals::DMA1_CH4>;
     DMA1_STREAM3 => dma::InterruptHandler<peripherals::DMA1_CH3>;
+    DMA2_STREAM0 => dma::InterruptHandler<peripherals::DMA2_CH0>;
     }
 );
-
-
 
 #[embassy_executor::main]
 async fn main1(spawner: Spawner) {
@@ -46,7 +45,7 @@ async fn main1(spawner: Spawner) {
     let mut internal_led = Output::new(p.PA5, Level::High, Speed::High);
 
     info!("Initializing ADC");
-    let mut adc = adc::Adc::new(p.ADC1, p.PA0);
+    let mut adc = adc::Adc::new(p.DMA2_CH0, p.ADC1, p.PA0);
 
     info!("Initializing I2C");
     let mut i2c = I2c::new(
@@ -159,7 +158,7 @@ async fn main1(spawner: Spawner) {
     if COLLECT_NEW_DATA {
         info!("Starting collecting new data");
         loop {
-            let adc_value = adc.measure();
+            let adc_value = adc.measure().await;
             let now = clock.read(&mut i2c).await;
             debug!(
                 "Adding new entry: {:?} {:?}",
